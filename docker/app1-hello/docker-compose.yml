@@ -1,0 +1,25 @@
+services:
+  hello-py:
+    build: ./python
+    image: n4nihir/hello-python:1.0
+    ports:
+      - 3000:3000
+    environment:
+      - ENV_VALUE=${ENV_VALUE_PYTHON}
+
+  hello-node:
+    build: ./node
+    image: n4nihir/hello-node:1.0
+    ports:
+      - 3001:3000
+    environment:
+      - ENV_VALUE=${ENV_VALUE_NODE}
+
+  hello-spring:
+    build: ./spring
+    image: n4nihir/hello-spring:1.0
+    ports:
+      - 3002:3000
+    environment:
+      - ENV_VALUE=${ENV_VALUE_SPRING}
+      - SERVER_PORT=3000
