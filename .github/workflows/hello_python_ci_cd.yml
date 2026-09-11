@@ -1,4 +1,4 @@
-name: Hello Python App to Docker
+name: Hello Python App CI/CD
 
 on:
     push:
