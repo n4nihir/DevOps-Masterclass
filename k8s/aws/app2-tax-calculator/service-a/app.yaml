@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: service-a
-          image: embarkx/tax-service-a:latest
+          image: n4nihir/tax-service-a:python-latest
           env:
             - name: TAX_SERVICE_URL
               value: "http://service-b:4000"

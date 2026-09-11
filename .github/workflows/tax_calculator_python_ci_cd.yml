@@ -1,0 +1,90 @@
+name: Tax Calculator Python CI/CD to AWS EKS
+
+on:
+  # push
+  workflow_dispatch
+
+
+jobs:
+    build-test:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                service: [service-a, service-b]
+
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v7
+
+          - name: Setup Python
+            uses: actions/setup-python@v7
+            with:
+              python-version: '3.13'
+
+          - name: Installing Dependencies
+            working-directory: docker/app2-tax-calculator/python/${{ matrix.service }}
+            run: |
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+
+          - name: Run Smoke Test
+            working-directory: docker/app2-tax-calculator/python/${{ matrix.service }}
+            run: python -m py_compile main.py
+
+    docker-build-push:
+        runs-on: ubuntu-latest
+        needs: build-test
+        strategy:
+            matrix:
+                service: 
+                    - { name: "service-a", docker_name: "tax-service-a", path: "docker/app2-tax-calculator/python/service-a"}
+                    - { name: "service-b", docker_name: "tax-service-b", path: "docker/app2-tax-calculator/python/service-b"}
+
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v7
+
+          - name: Login to DockerHub
+            uses: docker/login-action@v3
+            with:
+                username: ${{ secrets.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}   
+            
+          - name: Build and Push Docker Image
+            uses: docker/build-push-action@v6
+            with:
+                context: ${{ matrix.service.path }}
+                push: true
+                tags: |
+                    ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service.docker_name }}:python-latest   
+
+
+    deploy-aws-eks:
+        runs-on: ubuntu-latest
+        needs: docker-build-push
+
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v7
+
+          - name: Configure AWS Credentials
+            uses: aws-actions/configure-aws-credentials@v5.1.1
+            with:
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: us-east-1
+
+          - name: Setup kubectl
+            uses: azure/setup-kubectl@v4
+
+          - name: Update kubeconfig for EKS
+            run: |
+              aws eks update-kubeconfig --name hello-cluster --region us-east-1
+
+          - name: Verify connection
+            run: kubectl get nodes
+
+          - name: Deploy to AWS (Kubernetes)
+            run: |
+                kubectl apply -f k8s/aws/app2-tax-calculator/service-a
+                kubectl apply -f k8s/aws/app2-tax-calculator/service-b

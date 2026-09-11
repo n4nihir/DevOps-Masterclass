@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: service-b
-          image: embarkx/tax-service-b:latest
+          image: n4nihir/tax-service-b:python-latest
           ports:
             - containerPort: 4000
 
