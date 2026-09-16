@@ -10,20 +10,20 @@ spec:
   rules:
     - http:
         paths:
-          # Frontend (React / Vite)
-          - path: /(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: frontend
-                port:
-                  number: 80
-
-          # Backend API
+          # Backend API - must come BEFORE the catch-all below, or /(.*) swallows it
           - path: /api/(.*)
             pathType: ImplementationSpecific
             backend:
               service:
                 name: service-a
+                port:
+                  number: 80
+
+          # Frontend (React / Vite) - catch-all, keep last
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: frontend
                 port:
                   number: 80
