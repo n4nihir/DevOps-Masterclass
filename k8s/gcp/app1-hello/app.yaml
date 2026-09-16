@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1-hello
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app1-hello
+  template:
+    metadata:
+      labels:
+        app: app1-hello
+    spec:
+      containers:
+        - name: app1-hello
+          image: n4nihir/hello-python:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+          env:
+            - name: ENV_VALUE
+              value: "Hello from app.yaml"
+            - name: DB_PASSWORD
+              value: "cGFzc3dvcmQ="      # base64 value for "password"
+          # env:
+          #   - name: APP_MESSAGE
+          #     valueFrom:
+          #       configMapKeyRef:
+          #         name: app-config
+          #         key: APP_MESSAGE
+          #   - name: DB_PASSWORD
+          #     valueFrom:
+          #       secretKeyRef:
+          #         name: db-secret
+          #         key: DB_PASSWORD
+          ports:
+            - containerPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1-hello
+spec:
+  selector:
+    app: app1-hello
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 3000

@@ -72,6 +72,24 @@ __pycache__/
 **/*.key
 **/*.crt
 
+# GCP service-account JSON keys — never commit these
+**/*-key.json
+**/*-sa-key.json
+**/service-account*.json
+**/gcp-credentials*.json
+github-actions-key.json
+**/application_default_credentials.json
+**/client_secret*.json
+
+# Other cloud / cluster credentials
+**/.aws/credentials
+**/.gcloud/
+**/kubeconfig
+**/*.kubeconfig
+**/*.p12
+**/*.pfx
+**/*.jks
+
 # Docker
 **/.docker/
 **/.dockerignore~
@@ -109,3 +127,26 @@ pnpm-debug.log*
 *.so
 *.dll
 *.exe
+
+# Terraform
+# .terraform/ holds downloaded provider binaries (hundreds of MB) - never commit
+**/.terraform/
+# State files can contain plaintext secrets and must not be committed
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+# Saved plan files are zip archives containing full resource values
+tfplan
+*.tfplan
+# CLI config can hold registry credentials
+.terraformrc
+terraform.rc
+# Local overrides are machine-specific by design
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+crash.log
+crash.*.log
+# Keep the dependency lock file - it is meant to be committed
+!.terraform.lock.hcl
