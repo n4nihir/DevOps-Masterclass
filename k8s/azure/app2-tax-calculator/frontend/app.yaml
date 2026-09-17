@@ -15,6 +15,7 @@ spec:
       containers:
         - name: frontend
           image: n4nihir/tax-calculator-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
 

@@ -15,6 +15,7 @@ spec:
       containers:
         - name: service-a
           image: n4nihir/tax-service-a:python-latest
+          imagePullPolicy: Always
           env:
             - name: TAX_SERVICE_URL
               value: "http://service-b:4000"

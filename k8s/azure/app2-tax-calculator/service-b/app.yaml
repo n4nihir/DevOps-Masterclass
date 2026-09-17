@@ -15,6 +15,7 @@ spec:
       containers:
         - name: service-b
           image: n4nihir/tax-service-b:python-latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 4000
 
