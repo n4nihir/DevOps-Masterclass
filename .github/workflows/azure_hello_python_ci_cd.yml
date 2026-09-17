@@ -99,14 +99,21 @@ jobs:
               echo "CLUSTER_NAME value: ${CLUSTER_NAME}"
               echo "RESOURCE_GROUP value: ${RESOURCE_GROUP}"
             env:
-              CLUSTER_NAME: ${{ secrets.AZURE_CLUSTER_NAME }}
+              CLUSTER_NAME: ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
               RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
 
           - name: Set AKS Context
+            env:
+              CLUSTER_NAME: ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
+              RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
             run: |
+              set -euo pipefail
+              : "${CLUSTER_NAME:?AZURE_CLUSTER_NAME secret is empty or not set}"
+              : "${RESOURCE_GROUP:?AZURE_RESOURCE_GROUP secret is empty or not set}"
               az aks get-credentials \
-                --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-                --name ${{ secrets.AZURE_CLUSTER_NAME }}
+                --resource-group "$RESOURCE_GROUP" \
+                --name "$CLUSTER_NAME" \
+                --overwrite-existing
 
           - name: Verify connection
             run: kubectl get nodes
